@@ -2,7 +2,7 @@
     "path" : "~/BYUI/Math 325/IntermediateStats",
     "sortOrder" : [
         {
-            "ascending" : true,
+            "ascending" : false,
             "columnIndex" : 2
         }
     ]
