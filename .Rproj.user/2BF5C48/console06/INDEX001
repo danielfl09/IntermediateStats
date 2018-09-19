@@ -1,1 +1,1 @@
-[]
+[{"allow_restart":false,"alt_buffer":false,"autoclose":1,"buffered_output":"To https://github.com/danielfl09/IntermediateStats.git\n   99a8111..43ee9c2  master -> master\n","caption":"Git Push","channel_id":"","channel_mode":0,"child_procs":false,"cols":80,"cwd":"","exit_code":0,"handle":"7D0D5C3B","interaction_mode":0,"max_output_lines":500,"restarted":false,"rows":25,"shell_type":0,"show_on_output":false,"terminal_sequence":0,"title":"","track_env":false,"zombie":false}]
