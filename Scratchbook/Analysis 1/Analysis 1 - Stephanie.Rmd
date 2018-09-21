@@ -10,7 +10,7 @@ output:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
-library(mosaic)
+library(ggrepel)
 library(leaflet)
 library(USAboundaries)
 
@@ -22,13 +22,24 @@ Rent <- read_csv("../../Data/Rent.csv") %>%
 
 ```{r, fig.align='center', comment=NA, warning=FALSE}
 ### Distance ~ Price ~ Gender
+CheapNClose <- 
+  Rent %>% 
+  filter(Price < quantile(Rent$Price, 0.30)) %>% 
+  filter(MilesToCampus < quantile(Rent$MilesToCampus, 0.30))
+
+
 Rent %>% 
   ggplot(aes(MilesToCampus, Price, color = Gender, group = Gender)) +
   geom_point() +
+  geom_label_repel(data = CheapNClose, aes(label = Apartment),
+                   box.padding   = 0.35, 
+                   point.padding = 0.5,
+                   segment.color = 'grey50',
+                   alpha = 0.7) +
   geom_smooth(se = FALSE) +
   facet_grid(Gender ~ .) +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 90)) +
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none") +
   labs(
     x = "Miles to Campus",
     y = "Price",
@@ -42,10 +53,10 @@ Rent %>%
 ```{r, fig.align='center'}
 ### Leaflet Map
 getColor <- function(Rent) {
-  sapply(Rent$MilesToCampus, function(MilesToCampus) {
-    if(MilesToCampus <= 0.25) {
+  sapply(Rent$Price, function(Price) {
+    if(Price <= 1000) {
       "green"
-    } else if(MilesToCampus <= 0.5) {
+    } else if(Price <= 1200) {
       "yellow"
     } else {
       "red"
@@ -61,6 +72,9 @@ icons <- awesomeIcons(
 
 leaflet(options = leafletOptions()) %>% 
   addTiles() %>% 
+  addLabelOnlyMarkers(data = CheapNClose,
+             label = ~Apartment,
+             labelOptions = labelOptions(noHide = T)) %>%
   addAwesomeMarkers(data = Rent,
                     lng = ~Longitude,
                     lat = ~Latitude,
