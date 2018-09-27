@@ -1,30 +1,38 @@
-library(tidyverse)
 library(mosaic)
+library(USAboundaries)
+library(scales)
+library(tidyverse)
 library(leaflet)
 library(ggrepel)
-library(USAboundaries)
+library(plotly)
 
 Rent <- read_csv("./Data/Rent.csv") %>% 
-  na.omit()
+  na.omit() %>% 
+  mutate(
+    Size = case_when(
+      Capacity < 50 ~ "Small",
+      Capacity < 100 ~ "Medium",
+      TRUE ~ "Large"
+    )
+  )
 
 
 ### Distance ~ Price ~ Gender
 CheapNClose <- 
   Rent %>% 
+  filter(Gender == "F") %>%
   filter(Price < quantile(Rent$Price, 0.30)) %>% 
   filter(MilesToCampus < quantile(Rent$MilesToCampus, 0.30))
 
 
 Rent %>% 
-  ggplot(aes(MilesToCampus, Price, color = Gender, group = Gender)) +
-  geom_point() +
-  geom_label_repel(data = CheapNClose, aes(label = Apartment),
-                   box.padding   = 0.35, 
-                   point.padding = 0.5,
-                   segment.color = 'grey50',
-                   alpha = 0.7) +
-  geom_smooth(se = FALSE) +
-  facet_grid(Gender ~ .) +
+  filter(Gender == "F") %>% 
+  ggplot(aes(MilesToCampus, Price, color = Gender, group = Gender),
+         color = ) +
+  geom_jitter() +
+  scale_x_continuous(breaks = seq(0,0.8,by = 0.1)) +
+  scale_y_continuous(labels = dollar_format()) +
+  facet_grid(Size ~ .) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90), legend.position = "none") +
   labs(
@@ -33,7 +41,13 @@ Rent %>%
     color = "Gender"
   )
 
-
+Rent %>% plot_ly(x = ~MilesToCampus,
+                 y = ~Price,
+                 size = ~Capacity,
+                 color = ~Price,
+                 text = ~paste("Apartment: ", Apartment,
+                               "<br>Price: ", Price,
+                               "<br>Capacity: ", Capacity))
 
 
 
