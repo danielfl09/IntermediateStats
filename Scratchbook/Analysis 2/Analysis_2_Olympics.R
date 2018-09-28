@@ -18,21 +18,30 @@ ideal <-
     Medal == "Bronze" ~ 1,
     TRUE ~ 0
   ))
+##########
+# Males
+##########
 
-cor_data <- 
+cor_data_males <- 
   ideal %>% 
+  filter(Sex == "M") %>% 
   select(Age, Height, Weight, Medal_pts)
+head(cor_data)
 
-cormat <- round(cor(cor_data),2)
-head(cormat)
+cormat_males <- round(cor(cor_data_males, method = "kendall"),2)
+head(cormat_males)
 
-melted_cormat <- melt(cormat)
-head(melted_cormat)
+melted_cormat_males <- melt(cormat_males)
+head(melted_cormat_males)
+
+############
+# Triangle Functions
+###########
 
 # Get lower triangle of the correlation matrix
-get_lower_tri <- function(cormat){
-  cormat[upper.tri(cormat)] <- NA
-  return(cormat)
+get_lower_tri <- function(cormat_males){
+  cormat_males[upper.tri(cormat_males)] <- NA
+  return(cormat_males)
 }
 
 # Get upper triangle of the correlation matrix
@@ -41,10 +50,10 @@ get_upper_tri <- function(cormat){
   return(cormat)
 }
 
-upper_tri <- get_upper_tri(cormat)
-melted_cormat <- melt(upper_tri, na.rm = TRUE)
+upper_tri_males <- get_upper_tri(cormat_males)
+melted_cormat_males <- melt(upper_tri_males, na.rm = TRUE)
 
-ggplot(data = melted_cormat, aes(Var2, Var1, fill = value)) +
+ggplot(data = melted_cormat_males, aes(Var2, Var1, fill = value)) +
   geom_tile(color = "white") + 
   geom_text(aes(label = value), color = "black") +
   scale_fill_gradient2(low = "blue", high = "red", mid = "white",
@@ -58,5 +67,87 @@ ggplot(data = melted_cormat, aes(Var2, Var1, fill = value)) +
         legend.direction = "horizontal") + 
   guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
                                title.position = "top", title.hjust = 0.5)) +
-  coord_fixed()
-  
+  coord_fixed() +
+  labs(
+    title = "Age, height and weight are positively correlated with Winning Medals"
+  )
+ggsave(filename = "./Scratchbook/Analysis 2/cor_matrix_males.png")
+
+
+
+###########
+# Females
+###########
+
+cor_data_females <- 
+  ideal %>% 
+  filter(Sex == "F") %>% 
+  select(Age, Height, Weight, Medal_pts)
+
+cormat_females <- round(cor(cor_data_females),2)
+head(cormat_females)
+
+melted_cormat_females <- melt(cormat_females)
+head(melted_cormat_females)
+
+############
+# Triangle Functions
+###########
+
+# Get lower triangle of the correlation matrix
+get_lower_tri <- function(cormat_females){
+  cormat_females[upper.tri(cormat_females)] <- NA
+  return(cormat_females)
+}
+
+# Get upper triangle of the correlation matrix
+get_upper_tri <- function(cormat_females){
+  cormat_females[lower.tri(cormat_females)] <- NA
+  return(cormat_females)
+}
+
+upper_tri_females <- get_upper_tri(cormat_females)
+melted_cormat_females <- melt(upper_tri_females, na.rm = TRUE)
+
+ggplot(data = melted_cormat_females, aes(Var2, Var1, fill = value)) +
+  geom_tile(color = "white") + 
+  geom_text(aes(label = value), color = "black") +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+                       midpoint = 0, limit = c(-1, 1), space = "lab",
+                       name = "Pearson\nCorrelation") +
+  theme_bw() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.justification = c(1, 0),
+        legend.position = c(0.40, 0.75),
+        legend.direction = "horizontal") + 
+  guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+                               title.position = "top", title.hjust = 0.5)) +
+  coord_fixed() +
+  labs(
+    title = "Age, height and weight are positively correlated with Winning Medals"
+  )
+ggsave(filename = "./Scratchbook/Analysis 2/cor_matrix_females.png")
+
+
+
+#####################################################################################
+# Find the most common height among medal winners
+#####################################################################################
+
+write.csv(ideal, "./Data/olympic_ideal.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
