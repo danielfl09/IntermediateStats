@@ -1,0 +1,91 @@
+---
+title: "Analysis 2 - Olympic Data"
+output:
+  html_document:
+    code_folding: hide
+    theme: paper
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(mosaic)
+library(reshape2)
+library(plotly)
+library(pander)
+
+ideal <- read_csv("../../Data/olympic_ideal.csv")
+
+```
+
+# Olympic Data Crunch
+The goal of this assignment is to generate a question that the Olympic data can answer, and then do our best to find that answer. My initial question was, "Is there an ideal age for an Olympic medalist?" As you will soon see, I wasn't able to find my answer, but I learned a lot in the process. 
+
+## Medals and Age
+I first tried to answer my question by creating a correlation matrix that compared each of the following quantitative variables to each other: Age, Height, Weight, and Medal Points. "Medal Points" is not something that is found in the original dataset, I had to create it by giving my own value to each type of medal. I assigned a 3 to Gold, 2 to Silver, 1 to Bronze, and 0 to those that earned no medal. I thought the resulting correlation matrix was very interesting, but after speaking with Brother Morring, I learned that the results meant nothing. This was because I assigned my own value, which made the statistical results worthless. For that reason, I did not include them here. 
+
+After exploring the data a bit more, I decided to create the following graphic:
+
+```{r, fig.align='center', message=FALSE, warning=FALSE}
+ideal %>% 
+  plot_ly(type = 'violin') %>% 
+  add_trace(
+    x = ~Medal[ideal$Sex == "M"],
+    y = ~Age[ideal$Sex == "M"],
+    legendgroup = 'Male',
+    scalegroup = 'Male',
+    name = 'Male',
+    side = 'negative',
+    box = list(
+      visible = T
+    ),
+    meanline = list(
+      visible = T
+    )
+  ) %>% 
+  layout(
+    xaxis = list(
+      title = "Medal"
+    ),
+    yaxis = list(
+      title = "Age",
+      zeroline = T
+    )
+  ) %>% 
+  add_trace(
+    x = ~Medal[ideal$Sex == "F"],
+    y = ~Age[ideal$Sex == "F"],
+    legendgroup = 'Female',
+    scalegroup = 'Female',
+    name = 'Female',
+    side = 'positive',
+    box = list(
+      visible = T
+    ),
+    meanline = list(
+      visible = T
+    )
+  ) %>% 
+  layout(
+    title = "Interactive Plot of Athlete Age VS. Olympic Medals",
+    xaxis = list(
+      title = "Medal"
+    ),
+    yaxis = list(
+      title = "Age",
+      zeroline = T
+    )
+  )
+```
+
+The above graphic doesn't only display the distribution of ages among all of the Olympic medal winners, but it also shows the difference between the male and female distributions as well as the maximum and minimul values for each. For example, the oldest Gold Medal winner was a man and 59 years old. In contrast, the oldest woman Gold Medal winner was 47 years old. 
+
+
+<!-- ## Age and Gender -->
+
+<!-- ```{r, fig.align='center', message=FALSE} -->
+<!-- pander(ceiling(mean(Age ~ Sex, data = ideal)),1) -->
+<!-- ``` -->
+
+## Conclusion
+
+The most interesting conclusion I drew from this graphic is that for both Male and Female athletes that won a medal, those that won the Gold Medal are on average younger than those that won Silver or Bronze. However, those that didn't win are on average younger than those that did. To me, this points to a possible conclusion that the ideal age for an Olympic athlete is greater than the average Olympic athlete's age. I'm sure that with the right set of statistical knowledge, a sufficient answer to my original question could be found with this data set, however, I am happy with what I have found.

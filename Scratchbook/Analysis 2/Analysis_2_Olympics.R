@@ -1,6 +1,7 @@
 library(tidyverse)
 library(mosaic)
 library(reshape2)
+library(plotly)
 
 # Create a Correlation matirx
 # Following example found here: "http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization"
@@ -18,6 +19,141 @@ ideal <-
     Medal == "Bronze" ~ 1,
     TRUE ~ 0
   ))
+
+ideal$Medal <- factor(ideal$Medal, levels = c("Gold", "Silver", "Bronze", "no medal"))
+
+#####################################################################################
+# Find the most common height among medal winners
+#####################################################################################
+
+#write.csv(ideal, "./Data/olympic_ideal.csv")
+gold <- 
+  ideal %>% 
+  filter(Medal == "Gold")
+
+silver <- 
+  ideal %>% 
+  filter(Medal == "Silver")
+
+bronze <- 
+  ideal %>% 
+  filter(Medal == "Bronze")
+
+nomedal <- 
+  ideal %>% 
+  filter(Medal == "no medal")
+
+
+ggplot() + 
+  geom_violin(data = gold, aes(x = Medal, y = Age), fill = "gold")  + 
+  geom_violin(data = silver, aes(x = Medal, y = Age), fill = "grey69")  +
+  geom_violin(data = bronze, aes(x = Medal, y = Age), fill = "brown")  +
+  geom_violin(data = nomedal, aes(x = Medal, y = Age), fill = "white")  +
+  facet_wrap(~Sex, ncol = 4) + 
+  labs(title = "Medal Winners By Age") +
+  theme_bw()
+
+ggplot() + 
+  geom_violin(data = gold, aes(x = Medal, y = Height), fill = "gold")  + 
+  geom_violin(data = silver, aes(x = Medal, y = Height), fill = "grey69")  +
+  geom_violin(data = bronze, aes(x = Medal, y = Height), fill = "brown")  +
+  geom_violin(data = nomedal, aes(x = Medal, y = Height), fill = "white")  + 
+  facet_wrap(~Sex, ncol = 4) + 
+  labs(title = "Medal Winners By Height") +
+  theme_bw()
+
+ggplot() + 
+  geom_violin(data = gold, aes(x = Medal, y = Weight), fill = "gold")  + 
+  geom_violin(data = silver, aes(x = Medal, y = Weight), fill = "grey69")  +
+  geom_violin(data = bronze, aes(x = Medal, y = Weight), fill = "brown")  +
+  geom_violin(data = nomedal, aes(x = Medal, y = Weight), fill = "white")  + 
+  facet_wrap(~Sex, ncol = 4) + 
+  labs(title = "Medal Winners By Weight") +
+  theme_bw()
+
+
+ideal %>% 
+  plot_ly(
+    x = ~Medal,
+    y = ~Age, 
+    split = ~Medal,
+    type = 'violin',
+    box = list(
+      visible = T
+    ),
+    meanline = list(
+      visible = T
+    )
+  ) %>% 
+  layout(
+    xaxis = list(
+      title = "Medal"
+    ),
+    yaxis = list(
+      title = "Age",
+      zeroline = T
+    )
+  )
+
+ideal %>% 
+  plot_ly(type = 'violin') %>% 
+  add_trace(
+    x = ~Medal[ideal$Sex == "M"],
+    y = ~Age[ideal$Sex == "M"],
+    legendgroup = 'Male',
+    scalegroup = 'Male',
+    name = 'Male',
+    side = 'negative',
+    box = list(
+      visible = T
+    ),
+    meanline = list(
+      visible = T
+    )
+  ) %>% 
+  layout(
+    xaxis = list(
+      title = "Medal"
+    ),
+    yaxis = list(
+      title = "Age",
+      zeroline = T
+    )
+  ) %>% 
+  add_trace(
+    x = ~Medal[ideal$Sex == "F"],
+    y = ~Age[ideal$Sex == "F"],
+    legendgroup = 'Female',
+    scalegroup = 'Female',
+    name = 'Female',
+    side = 'positive',
+    box = list(
+      visible = T
+    ),
+    meanline = list(
+      visible = T
+    )
+  ) %>% 
+  layout(
+    xaxis = list(
+      title = "Medal"
+    ),
+    yaxis = list(
+      title = "Age",
+      zeroline = T
+    )
+  )
+
+
+
+
+
+
+
+
+
+
+
 ##########
 # Males
 ##########
@@ -25,8 +161,8 @@ ideal <-
 cor_data_males <- 
   ideal %>% 
   filter(Sex == "M") %>% 
-  select(Age, Height, Weight, Medal_pts)
-head(cor_data)
+  select(Age, Height, Weight, Medal)
+head(cor_data_males)
 
 cormat_males <- round(cor(cor_data_males, method = "kendall"),2)
 head(cormat_males)
@@ -131,11 +267,7 @@ ggsave(filename = "./Scratchbook/Analysis 2/cor_matrix_females.png")
 
 
 
-#####################################################################################
-# Find the most common height among medal winners
-#####################################################################################
 
-write.csv(ideal, "./Data/olympic_ideal.csv")
 
 
 
