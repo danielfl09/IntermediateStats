@@ -26,10 +26,15 @@ Customize this page and any of the Math 325 Notebook so that it becomes a useful
 **1 Quantitative Variable**
 
 
+**Appropriate Summaries**
 
+[Mean, Median, Mode, Standard Deviation, Variance](NumericalSummaries.html)
 
+**Appropriate Test**
 
+[One-Sample t-Test](tTests.html)
 
+**Appropriate Graphs**
 
 
 <!------------------------------------------------>
