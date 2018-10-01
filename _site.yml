@@ -10,6 +10,12 @@ navbar:
           href: GraphicalSummaries.html
         - text: "Numerical Summaries"
           href: NumericalSummaries.html
+    - text: "Making Inference"
+      menu:
+        - text: "Making Inference"
+          href: MakingInference.html
+        - text: "t Tests"
+          href: tTests.html
     - text: "R Help"
       menu:
         - text: "R Commands"
