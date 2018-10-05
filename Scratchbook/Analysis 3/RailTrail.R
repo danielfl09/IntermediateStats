@@ -1,47 +1,25 @@
----
-title: "Rail Trail t Test"
-output: 
-  html_document:
-    theme: cerulean
-    code_folding: hide
----
-
-```{r, message=FALSE, warning=FALSE}
-#library(mosaic)
-library(DT)
-library(pander)
-```
-
-<!-- Instructions
-
-1. Use the RailTrail dataset in R to come up with a question that can be answered with a t Test. 
-
-2. Establish why the question is interesting and rephrase the question using a statistical "null" and "alternative" hypothesis. (Hint, see the "Math 325 Notebook -> R Help -> R-Markdown Hints" page of your textbook for instructions on how to write mathematical hypotheses.)
-
-3. Clearly answer your question using statistics. Be sure to compute a p-value and provide supporting numerical and graphical summaries.
-
-For details about the RailTrail dataset type the command:
-  > ?RailTrail 
-into your Console and study the help file that appears. Also, if you want extra information, browse this document that has images and further details:
-http://www.northamptonma.gov/DocumentCenter/View/5244   
-
-
-Note: you can create "groups" from the data in many ways. For example, you can create a variable in your RailTrail dataset that is called "rain" and has categories of "yes" and "no" with the code:
-
-
-
--->
-
-```{r}
-#library(ggplot2)
-#library(mosaic)
+library(tidyverse)
+library(mosaic)
 library(reshape2)
 library(plotly)
-#library(pander)
+library(pander)
 
 
 # Add new columns for Weekday and Weekend in the style as the season columns
-railtrail <- read.csv("../Data/railtrail.csv")
+railtrail <- RailTrail %>% 
+  mutate(
+    Weekday = case_when(
+      dayType == "weekday" ~ 1,
+      TRUE                 ~ 0
+    ),
+    Weekend = case_when(
+      dayType == "weekend" ~ 1,
+      TRUE                 ~ 0
+    )
+  ) %>% 
+  select(-c(weekday, dayType))
+
+#write.csv(railtrail, "./Data/railtrail.csv")
 
 # Step 1
 cormat_trail <- round(cor(railtrail),2)
@@ -113,14 +91,3 @@ plot_3 <- ggplot() +
   theme_bw()
 
 # Adjust layout of the graphs
-grid <- matrix(c(1, 1, 2, 3),
-               nrow = 2,
-               ncol = 2,
-               byrow = TRUE)
-
-layout(grid)
-plot_1
-plot_2
-plot_3
-```
-
