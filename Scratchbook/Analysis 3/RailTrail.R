@@ -75,15 +75,24 @@ plot_1 <- ggplot() +
                alpha = 0.25) +
   theme_bw()
 
+plot_1
+
+
+# Student's t-Test
+pander(t.test(railtrail$hightemp, railtrail$volume, mu = 0, alternative = "two.sided"))
+
+pander(t.test(railtrail$hightemp, railtrail$volume, mu = 0, alternative = "two.sided"))
+
+
+
 # Faceted Density Plot
-plot_2 <- ggplot() +
+ggplot() +
   geom_density(data = rail.scale,
                aes(x = hightemp),
-               fill = "red",
-               alpha = 0.25) +
+               fill = "red") +
   theme_bw()
 
-plot_3 <- ggplot() +
+ggplot() +
   geom_density(data = rail.scale,
                aes(x = volume),
                fill = "blue",
@@ -91,3 +100,8 @@ plot_3 <- ggplot() +
   theme_bw()
 
 # Adjust layout of the graphs
+hist(rail.scale$hightemp, breaks=20, xlim=c(-3,3), col=rgb(1,0,0,0.5))
+hist(rail.scale$volume, breaks=20, col=rgb(0,0,1,0.5), add=T)
+box()
+
+
