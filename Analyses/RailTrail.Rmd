@@ -118,9 +118,5 @@ grid <- matrix(c(1, 1, 2, 3),
                ncol = 2,
                byrow = TRUE)
 
-layout(grid)
-plot_1
-plot_2
-plot_3
 ```
 
