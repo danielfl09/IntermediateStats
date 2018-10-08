@@ -4,6 +4,7 @@ library(reshape2)
 library(plotly)
 library(pander)
 
+options(scipen = 1)
 
 # Add new columns for Weekday and Weekend in the style as the season columns
 railtrail <- RailTrail %>% 
@@ -47,7 +48,8 @@ ggplot(data = melted_upper_tri, aes(Var2, Var1, fill = value)) +
                        midpoint = 0, limit = c(-1, 1), space = "lab",
                        name = "Pearson\nCorrelation") +
   theme_bw() +
-  theme(axis.title.x = element_blank(),
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         legend.justification = c(1, 0),
         legend.position = c(0.40, 0.75),
@@ -57,7 +59,7 @@ ggplot(data = melted_upper_tri, aes(Var2, Var1, fill = value)) +
                                title.position = "top", title.hjust = 0.5)) +
   coord_fixed() +
   labs(
-    title = ""
+    title = "There is a strong positive correlation between high temperatures and volume of park visitors."
   )
 
 rail.scale <- as.data.frame(scale(railtrail))
@@ -73,23 +75,26 @@ plot_1 <- ggplot() +
                  aes(x = volume),
                fill = "blue",
                alpha = 0.25) +
+  scale_fill_identity(name = "Legend",
+                      guide = 'legend',
+                      labels = c("High Temperature",
+                                 "Volume of Visitors")) +
   theme_bw()
 
 plot_1
 
 
 # Student's t-Test
-pander(t.test(railtrail$hightemp, railtrail$volume, mu = 0, alternative = "two.sided"))
-
-pander(t.test(railtrail$hightemp, railtrail$volume, mu = 0, alternative = "two.sided"))
-
+pander(t.test(railtrail$volume, railtrail$hightemp, mu = 0, alternative = "two.sided"))
 
 
 # Faceted Density Plot
-ggplot() +
-  geom_density(data = rail.scale,
-               aes(x = hightemp),
-               fill = "red") +
+railtrail %>% 
+  ggplot(aes(x = volume, y = hightemp)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_y_continuous(breaks = seq(40,100,by = 10)) +
+  scale_x_continuous(breaks = seq(100,800,by = 100)) +
   theme_bw()
 
 ggplot() +

@@ -7,8 +7,10 @@ output:
 ---
 
 ```{r, message=FALSE, warning=FALSE}
-#library(mosaic)
-library(DT)
+library(tidyverse)
+library(mosaic)
+library(reshape2)
+library(plotly)
 library(pander)
 ```
 
@@ -28,28 +30,85 @@ http://www.northamptonma.gov/DocumentCenter/View/5244
 
 Note: you can create "groups" from the data in many ways. For example, you can create a variable in your RailTrail dataset that is called "rain" and has categories of "yes" and "no" with the code:
 
-
-
 -->
 
 ```{r}
-#library(ggplot2)
-#library(mosaic)
-library(reshape2)
-library(plotly)
-#library(pander)
+railtrail <- RailTrail %>% 
+  mutate(
+    Weekday = case_when(
+      dayType == "weekday" ~ 1,
+      TRUE                 ~ 0
+    ),
+    Weekend = case_when(
+      dayType == "weekend" ~ 1,
+      TRUE                 ~ 0
+    )
+  ) %>% 
+  select(-c(weekday, dayType))
+```
+
+## Introduction
+The following analysis was done with the Rail Trail data set. Below is a description of this data set from its mosaicData help page.
+
+<div style="padding-left:50px;">
+The Pioneer Valley Planning Commission (PVPC) collected data north of Chestnut Street in Florence, MA for ninety days from April 5, 2005 to November 15, 2005. Data collectors set up a laser sensor, with breaks in the laser beam recording when a rail-trail user passed the data collection station.
+
+There is a potential for error when two users trigger the infrared beam at exactly the same time since the counter would only logs one of the crossings. The collectors left the motion detector out during the winter, but because the counter drops data when the temperature falls below 14 degrees Fahrenheit, there is no data for the cold winter months.
+</div>
 
 
-# Add new columns for Weekday and Weekend in the style as the season columns
-railtrail <- read.csv("../Data/railtrail.csv")
+## Hypotheses:
 
+I hypothesize the temperature of the day can explain the volume of visitors, or in other words, there is a correlation between the high temperatures of each day and the volume of visitors. For this test, I will be using the Student's t-Test.
+
+<div style="padding-left:15px;">
+$H_0: \mu_1 - \mu_2 = 0$ </br>
+$H_a: \mu_1 - \mu_2 \neq 0$
+</div>
+
+## Analysis
+
+
+### Scatter Plot and Trend Line
+Here is a scatter plot of the volume and high temperature of each day data was collected. I included a trendline to show the trend of the data points. You can see there seems to be a pattern, with the volume of visitors increasing with the high temperatures. Let's perform a test in search of some evidence.
+
+```{r message=FALSE, warning=FALSE}
+# Faceted Density Plot
+railtrail %>% 
+  ggplot(aes(x = volume, y = hightemp)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_y_continuous(breaks = seq(40,100,by = 10)) +
+  scale_x_continuous(breaks = seq(100,800,by = 100)) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(
+    title = "Trend line shows volume of visitors increases as temperatures rise.",
+    x = "Volume of visitors",
+    y = "High temperature"
+  )
+```
+
+
+### Student's t-Test
+Here are the results of the Student's t-Test.
+
+```{r}
+# Student's t-Test
+pander(t.test(railtrail$volume, railtrail$hightemp, mu = 0, alternative = "two.sided"))
+```
+
+Since the t-value is greater than the p-value, there is sufficient evidence to reject the null hypothesis. This suggests that there is a correlation between the high temperatures of each day and the volume of visitors. 
+
+### Pearson's Correlation Coefficient
+[Pearson's Correlation Coefficient](https://www.statisticshowto.datasciencecentral.com/probability-and-statistics/correlation-coefficient-formula/) is a statistical measurement of the strength of a relationship. The number could be positive or negative, depending on the type of relationship between variables. When I say "relationship"", I refer to how the change in one variable can cause a change in another. Below, I constructed a correlation matrix which shows how the variables in the Rail Trail data set relates to each other.
+
+```{r message=FALSE, warning=FALSE}
 # Step 1
 cormat_trail <- round(cor(railtrail),2)
-head(cormat_trail)
 
 # Step 2
 melted_cormat <- melt(cormat_trail)
-head(melted_cormat)
 
 # Step 3
 get_upper_tri <- function(data_set){
@@ -59,7 +118,6 @@ get_upper_tri <- function(data_set){
 
 upper_tri_trai <- get_upper_tri(cormat_trail)
 melted_upper_tri <- melt(upper_tri_trai, na.rm = TRUE)
-head(melted_upper_tri)
 
 # Step 4
 ggplot(data = melted_upper_tri, aes(Var2, Var1, fill = value)) +
@@ -69,54 +127,26 @@ ggplot(data = melted_upper_tri, aes(Var2, Var1, fill = value)) +
                        midpoint = 0, limit = c(-1, 1), space = "lab",
                        name = "Pearson\nCorrelation") +
   theme_bw() +
-  theme(axis.title.x = element_blank(),
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         legend.justification = c(1, 0),
-        legend.position = c(0.40, 0.75),
+        legend.position = c(0.50, 0.75),
         legend.direction = "horizontal",
         axis.text.x = element_text(angle = 45, hjust = 1)) + 
   guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
                                title.position = "top", title.hjust = 0.5)) +
   coord_fixed() +
   labs(
-    title = ""
+    title = "There is a strong positive correlation between \nhigh temperatures and volume of park visitors.",
+    x = "",
+    y = ""
   )
-
-rail.scale <- as.data.frame(scale(railtrail))
-View(rail.scale)
-
-# Layered Density Plot of High Temperature and Volume of Visitors
-plot_1 <- ggplot() +
-  geom_density(data = rail.scale,
-                 aes(x = hightemp),
-               fill = "red",
-               alpha = 0.25) +
-  geom_density(data = rail.scale,
-                 aes(x = volume),
-               fill = "blue",
-               alpha = 0.25) +
-  theme_bw()
-
-# Faceted Density Plot
-plot_2 <- ggplot() +
-  geom_density(data = rail.scale,
-               aes(x = hightemp),
-               fill = "red",
-               alpha = 0.25) +
-  theme_bw()
-
-plot_3 <- ggplot() +
-  geom_density(data = rail.scale,
-               aes(x = volume),
-               fill = "blue",
-               alpha = 0.25) +
-  theme_bw()
-
-# Adjust layout of the graphs
-grid <- matrix(c(1, 1, 2, 3),
-               nrow = 2,
-               ncol = 2,
-               byrow = TRUE)
-
 ```
 
+As you can see, there seems to be a positive correlation between high temperatures and volume of visitors. The correlation seems to be high in comparison to some of the other variables.
+
+## Conclusion
+The Student's t-Test provided sufficient evidence to reject the null hypothesis, which leaves me to conclude that there is a correlation between high temperatures and volume of visitors. 
+
+</br></br></br></br>
