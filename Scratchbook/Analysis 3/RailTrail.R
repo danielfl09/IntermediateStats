@@ -103,8 +103,9 @@ ggplot() +
   theme_bw()
 
 # Adjust layout of the graphs
+
 hist(rail.scale$hightemp, breaks=20, xlim=c(-3,3), col=rgb(1,0,0,0.5))
 hist(rail.scale$volume, breaks=20, col=rgb(0,0,1,0.5), add=T)
+legend("topleft", legend = c("High Temperature", "Volume", "Overlap"),
+     col = c(rgb(1,0,0,0.5), rgb(0,0,1,0.5), "#803FB9"), lwd = 5, bg = "#FFFFFF")
 box()
-
-
