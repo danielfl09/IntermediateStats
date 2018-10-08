@@ -4,8 +4,6 @@ library(reshape2)
 library(plotly)
 library(pander)
 
-options(scipen = 1)
-
 # Add new columns for Weekday and Weekend in the style as the season columns
 railtrail <- RailTrail %>% 
   mutate(

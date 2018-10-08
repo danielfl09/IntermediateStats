@@ -16,6 +16,8 @@ navbar:
           href: MakingInference.html
         - text: "t Tests"
           href: tTests.html
+        - text: "Wilcoxon Tests"
+          href: WilcoxonTests.html
     - text: "R Help"
       menu:
         - text: "R Commands"
