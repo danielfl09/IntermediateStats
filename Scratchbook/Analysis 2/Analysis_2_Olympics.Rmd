@@ -18,7 +18,7 @@ ideal <- read_csv("../../Data/olympic_ideal.csv")
 ```
 
 # Olympic Data Crunch
-The goal of this assignment is to generate a question that the Olympic data can answer, and then do our best to find that answer. My initial question was, "Is there an ideal age for an Olympic medalist?" As you will soon see, I wasn't able to find my answer, but I learned a lot in the process. 
+The goal of this assignment is to generate a question that the Olympic data can answer, and then do our best to find that answer. My initial question was, "Is there an ideal age for an Olympic medalist?" I thought this would be an interesting question because the Olympics are all about the amazing accomplishments of the human body, and I think if there was an age for peak performance, it would be easiest to find that among olympic athletes. As you will soon see, I wasn't able to find my answer, but I learned a lot in the process. 
 
 ## Medals and Age
 I first tried to answer my question by creating a correlation matrix that compared each of the following quantitative variables to each other: Age, Height, Weight, and Medal Points. "Medal Points" is not something that is found in the original dataset, I had to create it by giving my own value to each type of medal. I assigned a 3 to Gold, 2 to Silver, 1 to Bronze, and 0 to those that earned no medal. I thought the resulting correlation matrix was very interesting, but after speaking with Brother Morring, I learned that the results meant nothing. This was because I assigned my own value, which made the statistical results worthless. For that reason, I did not include them here. 
@@ -77,7 +77,22 @@ ideal %>%
   )
 ```
 
-The above graphic doesn't only display the distribution of ages among all of the Olympic medal winners, but it also shows the difference between the male and female distributions as well as the maximum and minimul values for each. For example, the oldest Gold Medal winner was a man and 59 years old. In contrast, the oldest woman Gold Medal winner was 47 years old. 
+The above graphic doesn't only display the distribution of ages among all of the Olympic medal winners, but it also shows the difference between the male and female distributions as well as the maximum and minimul values for each. For example, the oldest Gold Medal winner was a man and 59 years old. In contrast, the oldest woman Gold Medal winner was 47 years old.
+
+#### Male Five-Number Summary
+
+```{r}
+ideal_m <- ideal %>% filter(Sex == 'M')
+ideal_f <- ideal %>% filter(Sex == 'F')
+
+pander(fav_stats(ideal_m$Age))
+```
+
+#### Female Five-Number Summary
+
+```{r}
+pander(fav_stats(ideal_f$Age))
+```
 
 
 <!-- ## Age and Gender -->

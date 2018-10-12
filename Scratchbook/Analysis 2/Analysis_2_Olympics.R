@@ -2,6 +2,7 @@ library(tidyverse)
 library(mosaic)
 library(reshape2)
 library(plotly)
+library(pander)
 
 # Create a Correlation matirx
 # Following example found here: "http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization"
@@ -19,6 +20,12 @@ ideal <-
     Medal == "Bronze" ~ 1,
     TRUE ~ 0
   ))
+
+ideal_m <- ideal %>% filter(Sex == 'M')
+ideal_f <- ideal %>% filter(Sex == 'F')
+
+fav_stats(ideal_m$Age)
+fav_stats(ideal_f$Age)
 
 ideal$Medal <- factor(ideal$Medal, levels = c("Gold", "Silver", "Bronze", "no medal"))
 
